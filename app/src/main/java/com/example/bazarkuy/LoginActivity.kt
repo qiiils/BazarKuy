@@ -2,8 +2,8 @@ package com.example.bazarkuy
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -29,11 +28,17 @@ class LoginActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LoginScreen(
-                onLoginClick = { /* TODO: Implement login logic */ },
+                onLoginClick = { userType -> navigateToDashboard(userType) },
                 onForgotPasswordClick = { navigateToForgotPassword() },
                 onSignUpClick = { navigateToRegister() }
             )
         }
+    }
+
+    private fun navigateToDashboard(userType: String) {
+        val intent = Intent(this, Dashboard::class.java)
+        intent.putExtra("USER_TYPE", userType) // Passing user type to Dashboard
+        startActivity(intent)
     }
 
     private fun navigateToForgotPassword() {
@@ -49,11 +54,10 @@ class LoginActivity : ComponentActivity() {
 
 @Composable
 fun LoginScreen(
-    onLoginClick: () -> Unit,
+    onLoginClick: (String) -> Unit,
     onForgotPasswordClick: () -> Unit,
     onSignUpClick: () -> Unit
 ) {
-    // State for input fields
     val username = remember { mutableStateOf(TextFieldValue()) }
     val password = remember { mutableStateOf(TextFieldValue()) }
 
@@ -64,7 +68,6 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-        // Welcome Text
         Text(
             text = "Welcome!",
             style = TextStyle(
@@ -75,47 +78,47 @@ fun LoginScreen(
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // Username Input
         CustomTextField(
             value = username,
             label = "Username",
             isPassword = false,
-            iconRes = R.drawable.ic_username // Ensure this drawable exists
+            iconRes = R.drawable.ic_username
         )
 
-        // Password Input
         CustomTextField(
             value = password,
             label = "Password",
             isPassword = true,
-            iconRes = R.drawable.ic_password // Ensure this drawable exists
+            iconRes = R.drawable.ic_password
         )
 
-        // Forgot Password Button
-        val context = LocalContext.current
         TextButton(onClick = { onForgotPasswordClick() }) {
             Text(text = "Forgot Password?", color = Color.Blue)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Login Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = onLoginClick, modifier = Modifier.weight(1f)) {
+            Button(
+                onClick = { onLoginClick("UMKM") },
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(text = "Login as UMKM/Pengguna")
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = onLoginClick, modifier = Modifier.weight(1f)) {
+            Button(
+                onClick = { onLoginClick("Penyelenggara") },
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(text = "Login as Penyelenggara")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Sign Up Navigation
         TextButton(onClick = onSignUpClick) {
             Text(text = "Create an Account", color = Color.Blue)
         }
@@ -149,7 +152,6 @@ fun CustomTextField(
             )
         }
 
-        // Label
         Text(
             text = label,
             style = TextStyle(fontSize = 12.sp, color = Color.Gray),
