@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -65,53 +67,97 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Welcome!",
+            text = "Welcome",
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
+                fontSize = 50.sp,
+                color = Color.Black
+            )
+            )
+        Text(
+            text = "Back!",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 50.sp,
                 color = Color.Black
             ),
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        CustomTextField(
-            value = username,
-            label = "Username",
-            isPassword = false,
-            iconRes = R.drawable.ic_username
-        )
+    CustomTextField(
+        value = username.value.text,
+        onValueChange = { username.value = username.value.copy(text = it) },
+        label = "Username",
+        iconRes = R.drawable.ic_username,
+        placeholder = "Enter your username"
+    )
 
-        CustomTextField(
-            value = password,
-            label = "Password",
-            isPassword = true,
-            iconRes = R.drawable.ic_password
-        )
+    Spacer(modifier = Modifier.height(16.dp))
 
+    CustomTextField(
+        value = password.value.text,
+        onValueChange = { password.value = password.value.copy(text = it) },
+        label = "Password",
+        isPassword = true,
+        iconRes = R.drawable.ic_password,
+        placeholder = "Enter your password"
+    )
+
+        Spacer(modifier = Modifier.height(1.dp))
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp),
+        contentAlignment = Alignment.TopEnd
+    ) {
         TextButton(onClick = { onForgotPasswordClick() }) {
-            Text(text = "Forgot Password?", color = Color.Blue)
+            Text(
+                text = "Forgot Password?",
+                style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                color = Color.Red
+                )
+            )
         }
+    }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(8.dp), // Spasi antar tombol
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
                 onClick = { onLoginClick("UMKM") },
-                modifier = Modifier.weight(1f)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5D72E9)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color.Black)
             ) {
                 Text(text = "Login as UMKM/Pengguna")
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Button(
                 onClick = { onLoginClick("Penyelenggara") },
-                modifier = Modifier.weight(1f)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5D72E9)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color.Black)
             ) {
                 Text(text = "Login as Penyelenggara")
             }
@@ -119,43 +165,60 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = onSignUpClick) {
-            Text(text = "Create an Account", color = Color.Blue)
+        Box (
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(onClick = onSignUpClick) {
+                Text(
+                    text = "Create an Account",
+                    color = Color(0xFF5D72E9),
+                )
+            }
         }
     }
 }
 
 @Composable
 fun CustomTextField(
-    value: androidx.compose.runtime.MutableState<TextFieldValue>,
+    value: String,
+    onValueChange: (String) -> Unit,
     label: String,
-    isPassword: Boolean,
-    iconRes: Int
+    isPassword: Boolean = false,
+    iconRes: Int,
+    placeholder: String
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .background(Color.Gray.copy(alpha = 0.1f))
-                .border(1.dp, Color.Gray)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = "Icon",
-                modifier = Modifier.padding(end = 16.dp)
-            )
-            BasicTextField(
-                value = value.value,
-                onValueChange = { value.value = it },
-                textStyle = TextStyle(fontSize = 16.sp),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        Text(
-            text = label,
-            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-            modifier = Modifier.padding(top = 4.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White, RoundedCornerShape(16.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
+            .height(45.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes),
+            contentDescription = null,
+            tint = Color(0xFF5D72E9),
+            modifier = Modifier.size(24.dp)
         )
+        Spacer(modifier = Modifier.width(8.dp))
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        ) { innerTextField ->
+            if (value.isEmpty()) {
+                Text(
+                    text = placeholder,
+                    style = TextStyle(fontSize = 16.sp, color = Color.Gray)
+                )
+            }
+            innerTextField()
+        }
     }
 }

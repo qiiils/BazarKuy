@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -43,25 +45,22 @@ fun WelcomeScreen(onContinueClicked: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF5D72E9)) // Background biru
+            .background(Color(0xFF5D72E9))
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxSize()
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Bagian logo di atas
+            // Gambar logo
             Image(
-                painter = painterResource(id = R.drawable.logo), // Sesuaikan dengan nama file logo
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo",
-                modifier = Modifier
-                    .size(150.dp)
-                    .align(Alignment.CenterHorizontally)
+                modifier = Modifier.size(150.dp)
             )
 
-            // Teks Welcome
+            Spacer(modifier = Modifier.height(5.dp))
+
             Text(
                 text = "Welcome!",
                 style = TextStyle(
@@ -70,7 +69,7 @@ fun WelcomeScreen(onContinueClicked: () -> Unit) {
                     fontSize = 32.sp,
                     color = Color.White
                 ),
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 5.dp)
             )
 
             // Teks Grow Your Business
@@ -86,16 +85,14 @@ fun WelcomeScreen(onContinueClicked: () -> Unit) {
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
-            // Spacer untuk memisahkan teks dan tombol
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(50.dp))
 
-            // Tombol Let's Continue
             Button(
                 onClick = onContinueClicked,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF65D696)),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
@@ -104,10 +101,60 @@ fun WelcomeScreen(onContinueClicked: () -> Unit) {
                         fontFamily = Poppins,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp,
-                        color = Color(0xFF5D72E9) // Warna teks biru
+                        color = Color.White // Warna teks biru
                     )
                 )
             }
         }
     }
-}
+//    ---
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color(0xFF5D72E9)) // Background biru
+//            .padding(16.dp),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        Column(
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center, // Menggunakan Center agar elemen berada di tengah layar
+//            modifier = Modifier.fillMaxSize() // Agar Column mengisi seluruh layar
+//        ) {
+//            // Bagian logo di atas
+//            Image(
+//                painter = painterResource(id = R.drawable.logo),
+//                contentDescription = "Logo",
+//                modifier = Modifier.size(150.dp) // Ukuran gambar
+//            )
+//
+//            // Teks Welcome
+//            Text(
+//                text = "Welcome!",
+//                style = TextStyle(
+//                    fontFamily = Poppins,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 32.sp,
+//                    color = Color.White
+//                ),
+//                modifier = Modifier.padding(top = 16.dp)
+//            )
+//
+//            // Teks Grow Your Business
+//            Text(
+//                text = "Grow Your Business,\nReach More Customers!",
+//                style = TextStyle(
+//                    fontFamily = Poppins,
+//                    fontWeight = FontWeight.Normal,
+//                    fontSize = 18.sp,
+//                    color = Color.White
+//                ),
+//                modifier = Modifier.padding(top = 8.dp),
+//                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+//            )
+
+            // Spacer untuk memisahkan teks dan tombol
+//            Spacer(modifier = Modifier.weight(1f)) // Membuat ruang di antara teks dan tombol
+
+            // Tombol Let's Continue
+
+        }

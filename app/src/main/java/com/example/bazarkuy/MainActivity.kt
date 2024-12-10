@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Color as UiColor
 
 
@@ -57,7 +59,11 @@ fun SplashScreen(onTimeout: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF5D72E9))
+//            .background(Color(0xFF5D72E9))
+            .paint(
+                painter = painterResource(R.drawable.background_launcher),
+                contentScale = ContentScale.Crop
+            )
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
