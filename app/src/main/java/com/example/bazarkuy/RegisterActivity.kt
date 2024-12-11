@@ -4,20 +4,39 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.*
+//import androidx.compose.material3.ExposedDropdownMenu
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 
 class RegisterActivity : ComponentActivity() {
@@ -38,6 +57,7 @@ class RegisterActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(onRegisterClick: () -> Unit, onLoginClick: () -> Unit) {
     var username by remember { mutableStateOf("") }
@@ -45,99 +65,160 @@ fun RegisterScreen(onRegisterClick: () -> Unit, onLoginClick: () -> Unit) {
     var confirmPassword by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf("") }
     val roles = listOf("Penyelenggara Bazar", "UMKM")
-    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(10.dp),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Create an Account",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 24.dp)
+        androidx.compose.material3.Text(
+            text = "Create an",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 50.sp,
+                color = Color.Black
+            )
+        )
+        androidx.compose.material3.Text(
+            text = "Account",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 50.sp,
+                color = Color.Black
+            ),
+            modifier = Modifier.padding(bottom = 10.dp)
         )
 
         // Input Username
-        TextField(
+        CustomTextField(
             value = username,
             onValueChange = { username = it },
-            label = { Text("Username") },
-            modifier = Modifier.fillMaxWidth()
+            label = "Confirm Password",
+            iconRes = R.drawable.ic_username,
+            placeholder = "Enter your username"
         )
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Input Password
-        TextField(
+        CustomTextField(
             value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { password = it},
+            label = "Password",
+            isPassword = true,
+            iconRes = R.drawable.ic_password,
+            placeholder = "Enter your password"
         )
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Input Confirm Password
-        TextField(
+        CustomTextField(
             value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { confirmPassword = it},
+            label = "Password",
+            isPassword = true,
+            iconRes = R.drawable.ic_password,
+            placeholder = "Enter your password"
         )
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Dropdown untuk Role
-        Box(modifier = Modifier.fillMaxWidth()) {
-            TextField(
-                value = selectedRole,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Select Role") },
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    IconButton(onClick = { expanded = !expanded }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Dropdown Icon"
-                        )
-                    }
-                }
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+        RoleDropdown(
+            roles = roles,
+            selectedRole = selectedRole,
+            onRoleSelected = { selectedRole = it }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ){
+            Button(
+                onClick = { onRegisterClick() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF5D72E9)
+                ),
+                modifier = Modifier
+                    .width(250.dp)
+                    .height(50.dp),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color.Black)
             ) {
-                roles.forEach { role ->
-                    DropdownMenuItem(onClick = {
-                        selectedRole = role
-                        expanded = false
-                    }) {
-                        Text(text = role)
-                    }
-                }
+                Text(text = "Register")
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Tombol Register
-        Button(
-            onClick = onRegisterClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Register")
-        }
         Spacer(modifier = Modifier.height(16.dp))
 
         // Link untuk kembali ke Login
-        Text(
-            text = "I Already Have an Account Login",
-            color = MaterialTheme.colors.primary,
-            modifier = Modifier.clickable { onLoginClick() }
+        Box (
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(onClick = onLoginClick) {
+                Text(
+                    text = "Create an Account",
+                    color = Color(0xFF5D72E9),
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RoleDropdown(
+    roles: List<String>,
+    selectedRole: String,
+    onRoleSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedTextField(
+            value = selectedRole,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Select Role") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFF5D72E9),
+                unfocusedBorderColor = Color.Gray,
+                focusedLabelColor = Color(0xFF5D72E9),
+                unfocusedLabelColor = Color.Gray
+            )
         )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            roles.forEach { role ->
+                DropdownMenuItem(
+                    text = { Text(text = role) },
+                    onClick = {
+                        onRoleSelected(role)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
+        }
     }
 }

@@ -24,6 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+
+
+
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,38 +193,43 @@ fun CustomTextField(
     label: String,
     isPassword: Boolean = false,
     iconRes: Int,
-    placeholder: String
+    placeholder: String = ""
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(16.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(16.dp))
-            .height(45.dp)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = null,
-            tint = Color(0xFF5D72E9),
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        ) { innerTextField ->
-            if (value.isEmpty()) {
-                Text(
-                    text = placeholder,
-                    style = TextStyle(fontSize = 16.sp, color = Color.Gray)
-                )
-            }
-            innerTextField()
-        }
-    }
+    val primaryColor = Color(0xFF5D72E9)
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = {
+            Text(text = label)
+        },
+        placeholder = {
+            Text(text = placeholder)
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                tint = primaryColor,
+                modifier = Modifier.size(24.dp)
+            )
+        },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        singleLine = true,
+        colors = OutlinedTextFieldDefaults.colors(
+            // Warna border saat fokus
+            focusedBorderColor = primaryColor,
+            // Warna border saat tidak fokus
+            unfocusedBorderColor = Color.Gray,
+
+            // Warna label saat fokus
+            focusedLabelColor = primaryColor,
+            // Warna label saat tidak fokus
+            unfocusedLabelColor = Color.Gray,
+
+            // Warna kursor
+            cursorColor = primaryColor
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
 }
