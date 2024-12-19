@@ -1,4 +1,4 @@
-package com.example.bazarkuy
+package com.example.bazarkuy.ui.dashboard
 
 import android.os.Bundle
 import androidx.compose.foundation.Image

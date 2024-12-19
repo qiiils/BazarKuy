@@ -1,4 +1,4 @@
-package com.example.bazarkuy
+package com.example.bazarkuy.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*

@@ -1,4 +1,4 @@
-package com.example.bazarkuy
+package com.example.bazarkuy.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,8 +22,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.Text
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.graphics.Color as UiColor
-
+import com.example.bazarkuy.R
 
 
 class MainActivity : ComponentActivity() {
@@ -82,7 +80,7 @@ fun SplashScreen(onTimeout: () -> Unit) {
             Text(
                 text = "BazarKuy",
                 style = TextStyle(
-                    fontFamily = Poppins,  // Menggunakan font Poppins
+                    fontFamily = com.example.bazarkuy.ui.theme.Poppins,  // Menggunakan font Poppins
                     fontSize = 18.sp,        // Ukuran font
                     color = Color.White      // Warna teks putih
                 )

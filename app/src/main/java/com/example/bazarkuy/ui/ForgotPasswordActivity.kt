@@ -1,4 +1,4 @@
-package com.example.bazarkuy
+package com.example.bazarkuy.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
