@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 //        buildConfigField("String", "BASE_URL","\"https://8shnf50m-3000.asse.devtunnels.ms/\"")
-        buildConfigField("String", "BASE_URL", "\"http://10.44.10.107:3000/\"")
+        buildConfigField("String", "BASE_URL", "\"http://192.168.247.22:3000/\"")
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
