@@ -1,5 +1,6 @@
 package com.example.bazarkuy.ui.dashboard
 
+import DashboardViewModel
 import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,9 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -19,30 +20,59 @@ import androidx.compose.ui.unit.sp
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.bazarkuy.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import com.example.bazarkuy.data.remote.response.BazarResponse
+
 
 class Dashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    DashboardScreen()
-                }
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colors.background
+            ) {
+                DashboardScreen()
+            }
         }
     }
 }
 
+
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
+    // Memanggil fetch data saat pertama kali screen di-load
+    LaunchedEffect(Unit) {
+        viewModel.fetchBazaars()
+    }
+
+    // Observasi State dari ViewModel
+    val ongoingBazaars = viewModel.ongoingBazaars.value
+    val comingSoonBazaars = viewModel.comingSoonBazaars.value
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB))
+                )
+            )
             .padding(16.dp)
     ) {
         // Header
-        Text(text = "Hello, User!", style = TextStyle(fontSize = 24.sp, color = Color.Black))
+        Text(
+            text = "Hello, User!",
+            style = TextStyle(fontSize = 24.sp, color = Color.Black, letterSpacing = 1.5.sp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Visit our market day and find the best deals!",
@@ -51,107 +81,124 @@ fun DashboardScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Slider for Ongoing Bazaar
-        Text(text = "Ongoing Bazaar", style = TextStyle(fontSize = 20.sp, color = Color.Black))
+        Text(
+            text = "Ongoing Bazaar",
+            style = TextStyle(fontSize = 20.sp, color = Color.Black, letterSpacing = 1.2.sp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        OngoingBazaarSlider()
+        OngoingBazaarSlider(bazaars = ongoingBazaars)
         Spacer(modifier = Modifier.height(16.dp))
 
         // Coming Soon Bazaar
-        Text(text = "Coming Soon Bazaar", style = TextStyle(fontSize = 20.sp, color = Color.Black))
+        Text(
+            text = "Coming Soon Bazaar",
+            style = TextStyle(fontSize = 20.sp, color = Color.Black, letterSpacing = 1.2.sp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        ComingSoonBazaarList()
+        ComingSoonBazaarList(bazaars = comingSoonBazaars)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Apply Now
-        Text(text = "Apply Now", style = TextStyle(fontSize = 20.sp, color = Color.Black))
-        Spacer(modifier = Modifier.height(8.dp))
-        ApplyNowSection()
+    }
+}
+
+
+@Composable
+fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
+    println("Rendering OngoingBazaarSlider with ${bazaars.size} bazaars") // Tambahkan logging
+
+    if (bazaars.isEmpty()) {
+        Text(text = "No ongoing bazaars available", color = Color.Gray)
+    } else {
+        LazyRow {
+            items(bazaars.size) { index ->
+                val bazar = bazaars[index]
+                println("Rendering bazar: $bazar") // Tambahkan logging
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = 8.dp,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(250.dp, 150.dp)
+                ) {
+                    Box {
+                        Image(
+                            painter = painterResource(id = R.drawable.bazaar_image),
+                            contentDescription = "Bazaar Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .background(Color.Black.copy(alpha = 0.6f))
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                text = bazar.name,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = "Ends: ${bazar.eventDate}",
+                                color = Color.White,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun OngoingBazaarSlider() {
-    LazyRow {
-        items(5) { // Example for 5 items
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(250.dp, 150.dp)
-            ) {
-                Box {
+fun ComingSoonBazaarList(bazaars: List<BazarResponse>) {
+    println("Rendering ComingSoonBazaarList with ${bazaars.size} bazaars") // Tambahkan logging
+
+    if (bazaars.isEmpty()) {
+        Text(text = "No upcoming bazaars available", color = Color.Gray)
+    } else {
+        Column {
+            bazaars.forEach { bazar ->
+                println("Rendering coming soon bazar: $bazar") // Tambahkan logging
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(Color(0xFFEEEEEE), RoundedCornerShape(16.dp))
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
                     Image(
-                        painter = painterResource(id = R.drawable.bazaar_image), // Replace with your image resource
-                        contentDescription = "Bazaar Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Column(
+                        painter = painterResource(id = R.drawable.bazaar_image),
+                        contentDescription = "Bazaar Coming Soon",
                         modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .background(Color.Black.copy(alpha = 0.6f))
-                            .padding(8.dp)
-                    ) {
-                        Text(text = "Bazaar Name", color = Color.White, fontSize = 16.sp)
-                        Text(text = "Ends: 2024-12-31", color = Color.White, fontSize = 12.sp)
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = bazar.name,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Date: ${bazar.eventDate}",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "Location: ${bazar.location}",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
-    }
-}
-
-@Composable
-fun ComingSoonBazaarList() {
-    Column {
-        repeat(3) { // Example for 3 items
-            Row(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.LightGray, RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.bazaar_image), // Replace with your image resource
-                    contentDescription = "Bazaar Coming Soon",
-                    modifier = Modifier.size(60.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(text = "Bazaar Name", fontSize = 16.sp, color = Color.Black)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_calender), // Replace with calendar icon
-                            contentDescription = "Calendar Icon",
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "2025-01-01", fontSize = 12.sp, color = Color.Gray)
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_location), // Replace with location icon
-                            contentDescription = "Location Icon",
-                            tint = Color.Gray
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "Bazaar Location", fontSize = 12.sp, color = Color.Gray)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ApplyNowSection() {
-    Button(
-        onClick = { /* Add action */ },
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Blue)
-    ) {
-        Text(text = "Apply for Bazaar", color = Color.White, fontSize = 16.sp)
     }
 }

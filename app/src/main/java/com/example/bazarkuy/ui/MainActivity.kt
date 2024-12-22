@@ -36,6 +36,7 @@ class MainActivity : ComponentActivity() {
                 startActivity(Intent(this, WelcomeActivity::class.java))
                 finish() // Menutup MainActivity setelah pindah ke LoginActivity
             })
+            
         }
     }
 }
