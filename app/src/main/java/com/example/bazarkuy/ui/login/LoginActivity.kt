@@ -56,9 +56,8 @@ class LoginActivity : ComponentActivity() {
     }
 
     private fun navigateToDashboard(role: String) {
-        val intent = Intent(this, Dashboard::class.java)
         intent.putExtra("USER_ROLE", role) // Kirim role ke Dashboard
-        startActivity(intent)
+        startActivity(Intent(this, Dashboard::class.java))
         finish() // Hentikan LoginActivity
     }
 

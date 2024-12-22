@@ -9,16 +9,18 @@ data class BazarResponse(
     val name: String,
     @SerializedName("description")
     val description: String?,
-    @SerializedName("startDate")
-    val startDate: String,
-    @SerializedName("endDate")
-    val endDate: String,
+    @SerializedName("endEventDate")
+    val endEventDate: String,
+    @SerializedName("registrationStartDate")
+    val registrationStartDate: String,
+    @SerializedName("registrationEndDate")
+    val registrationEndDate: String,
     @SerializedName("location")
     val location: String,
     @SerializedName("status")
     val status: String,
-    @SerializedName("eventDate")
-    val eventDate: String,
+    @SerializedName("startEventDate")
+    val startEventDate: String,
     @SerializedName("organizerId")
     val organizerId: Int
 )

@@ -1,0 +1,67 @@
+package com.example.bazarkuy.ui.Navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.example.bazarkuy.ui.BazarDetailScreen
+import com.example.bazarkuy.ui.dashboard.DashboardScreen
+//import com.example.bazarkuy.ui.history.HistoryScreen
+//import com.example.bazarkuy.ui.notifications.NotificationsScreen
+//import com.example.bazarkuy.ui.profile.ProfileScreen
+
+sealed class NavRoutes(val route: String) {
+    object Home : NavRoutes("home")
+    object History : NavRoutes("history")
+    object Notifications : NavRoutes("notifications")
+    object Profile : NavRoutes("profile")
+    object BazarDetail : NavRoutes("bazar_detail/{bazarId}") {
+        fun createRoute(bazarId: Int) = "bazar_detail/$bazarId"
+    }
+}
+
+@Composable
+fun SetupNavGraph(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = NavRoutes.Home.route
+    ) {
+        // Home/Dashboard Route
+        composable(NavRoutes.Home.route) {
+            DashboardScreen(
+                onBazarClick = { bazarId ->
+                    navController.navigate(NavRoutes.BazarDetail.createRoute(bazarId))
+                }
+            )
+        }
+
+        // Bazar Detail Route
+        composable(
+            route = NavRoutes.BazarDetail.route,
+            arguments = listOf(
+                navArgument("bazarId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val bazarId = backStackEntry.arguments?.getInt("bazarId") ?: return@composable
+            BazarDetailScreen(
+                bazarId = bazarId,
+                onBackClick = { navController.navigateUp() }
+            )
+        }
+
+        // Other Routes
+        composable(NavRoutes.History.route) {
+            HistoryScreen()
+        }
+
+        composable(NavRoutes.Notifications.route) {
+            NotificationsScreen()
+        }
+
+        composable(NavRoutes.Profile.route) {
+            ProfileScreen()
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package com.example.bazarkuy.ui.dashboard
 
 import DashboardViewModel
+import android.content.Intent
 import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,7 +31,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import com.example.bazarkuy.data.remote.response.BazarResponse
-
+import androidx.compose.foundation.layout.*
+//import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.bazarkuy.ui.Navigation.CustomBottomNavigation
+import com.example.bazarkuy.ui.Navigation.SetupNavGraph
 
 class Dashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,10 +48,35 @@ class Dashboard : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colors.background
             ) {
-                DashboardScreen()
+            @Composable
+            fun DashboardActivity() {
+                val navController = rememberNavController()
+
+                Scaffold(
+                    bottomBar = {
+                        CustomBottomNavigation(navController = navController)
+                    }
+                ) { paddingValues ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        SetupNavGraph(navController = navController)
+                    }
+                }
+            }
             }
         }
     }
+
+//    private fun navigateToBazarDetail(role: String) {
+//        intent.putExtra("USER_ROLE", role) // Kirim role ke Dashboard
+//        startActivity(Intent(this, BazarDetail::class.java))
+//        finish() // Hentikan LoginActivity
+//    }
+
+
 }
 
 
@@ -54,7 +87,6 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
         viewModel.fetchBazaars()
     }
 
-    // Observasi State dari ViewModel
     val ongoingBazaars = viewModel.ongoingBazaars.value
     val comingSoonBazaars = viewModel.comingSoonBazaars.value
 
@@ -98,9 +130,11 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
         ComingSoonBazaarList(bazaars = comingSoonBazaars)
         Spacer(modifier = Modifier.height(16.dp))
 
-    }
-}
 
+
+    }
+
+}
 
 @Composable
 fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
@@ -121,6 +155,7 @@ fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
                         .size(250.dp, 150.dp)
                 ) {
                     Box {
+
                         Image(
                             painter = painterResource(id = R.drawable.bazaar_image),
                             contentDescription = "Bazaar Image",
@@ -141,10 +176,15 @@ fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
                                 maxLines = 1
                             )
                             Text(
-                                text = "Ends: ${bazar.eventDate}",
+                                text = "Periode: ${bazar.startEventDate} - ${bazar.endEventDate}",
                                 color = Color.White,
                                 fontSize = 12.sp
                             )
+//                            Text(
+//                                text = "Ends: ${bazar.endEventDate}",
+//                                color = Color.White,
+//                                fontSize = 12.sp
+//                            )
                         }
                     }
                 }
@@ -186,7 +226,7 @@ fun ComingSoonBazaarList(bazaars: List<BazarResponse>) {
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Date: ${bazar.eventDate}",
+                            text = "Date: ${bazar.registrationStartDate}",
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
