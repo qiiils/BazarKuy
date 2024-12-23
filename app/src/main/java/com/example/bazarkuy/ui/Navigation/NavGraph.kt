@@ -26,23 +26,19 @@ sealed class NavRoutes(val route: String) {
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.Home.route
+        startDestination = Screen.Dashboard.route
     ) {
-        // Home/Dashboard Route
-        composable(NavRoutes.Home.route) {
+        composable(Screen.Dashboard.route) {
             DashboardScreen(
                 onBazarClick = { bazarId ->
-                    navController.navigate(NavRoutes.BazarDetail.createRoute(bazarId))
+                    navController.navigate(Screen.BazarDetail.createRoute(bazarId))
                 }
             )
         }
 
-        // Bazar Detail Route
         composable(
-            route = NavRoutes.BazarDetail.route,
-            arguments = listOf(
-                navArgument("bazarId") { type = NavType.IntType }
-            )
+            route = Screen.BazarDetail.route,
+            arguments = listOf(navArgument("bazarId") { type = NavType.IntType })
         ) { backStackEntry ->
             val bazarId = backStackEntry.arguments?.getInt("bazarId") ?: return@composable
             BazarDetailScreen(
@@ -50,18 +46,19 @@ fun SetupNavGraph(navController: NavHostController) {
                 onBackClick = { navController.navigateUp() }
             )
         }
-
-        // Other Routes
-        composable(NavRoutes.History.route) {
-            HistoryScreen()
-        }
-
-        composable(NavRoutes.Notifications.route) {
-            NotificationsScreen()
-        }
-
-        composable(NavRoutes.Profile.route) {
-            ProfileScreen()
-        }
     }
 }
+
+        // Other Routes
+//        composable(NavRoutes.History.route) {
+//            HistoryScreen()
+//        }
+//
+//        composable(NavRoutes.Notifications.route) {
+//            NotificationsScreen()
+//        }
+//
+//        composable(NavRoutes.Profile.route) {
+//            ProfileScreen()
+
+//}

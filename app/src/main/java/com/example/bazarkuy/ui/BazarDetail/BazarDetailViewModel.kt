@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.retrofit.ApiConfig
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class BazarDetailViewModel : ViewModel() {
     private val _bazarDetail = mutableStateOf<BazarDetailResponse?>(null)
@@ -21,21 +22,23 @@ class BazarDetailViewModel : ViewModel() {
     fun fetchBazarDetail(bazarId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
-            _error.value = null
             try {
+                println("Fetching bazar detail for ID: $bazarId") // Debug log
                 val response = ApiConfig.apiService.getBazarDetail(bazarId)
-                println("Response code: ${response.code()}")
-                println("Response body: ${response.body()}")
-
-                if (response.isSuccessful) {
-                    _bazarDetail.value = response.body()
-                } else {
-                    _error.value = "Gagal mengambil detail bazar: ${response.code()}"
-                    println("Error body: ${response.errorBody()?.string()}")
+                println("Response received: $response") // Debug log
+                _bazarDetail.value = response
+                _error.value = null
+            } catch (e: HttpException) {
+                println("HTTP Error: ${e.code()} - ${e.message()}") // Debug log
+                when (e.code()) {
+                    401 -> _error.value = "Unauthorized: Silakan login kembali"
+                    403 -> _error.value = "Forbidden: Anda tidak memiliki akses"
+                    404 -> _error.value = "Bazar tidak ditemukan"
+                    else -> _error.value = "Error: ${e.message()}"
                 }
             } catch (e: Exception) {
-                _error.value = "Terjadi kesalahan: ${e.message}"
-                e.printStackTrace()
+                println("General Error: ${e.message}") // Debug log
+                _error.value = "Network error: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

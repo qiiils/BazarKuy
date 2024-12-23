@@ -26,19 +26,54 @@ import com.example.bazarkuy.R
 import com.example.bazarkuy.ui.bazardetail.BazarDetailViewModel
 import java.text.SimpleDateFormat
 import java.util.*
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
+import com.example.bazarkuy.data.local.UserPreferences
+import com.example.bazarkuy.ui.login.LoginActivity
+import kotlinx.coroutines.launch
 
+class BazarDetailActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bazarId = intent.getIntExtra("BAZAR_ID", -1)
+        setContent {
+            BazarDetailScreen(
+                bazarId = bazarId,
+                onBackClick = { finish() }
+            )
+        }
+    }
+}
 @Composable
 fun BazarDetailScreen(
     bazarId: Int,
     onBackClick: () -> Unit,
     viewModel: BazarDetailViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val userPreferences = remember { UserPreferences() }
+    var isAuthenticated by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     val bazarDetail by viewModel.bazarDetail
     val isLoading by viewModel.isLoading
     val error by viewModel.error
 
-    LaunchedEffect(bazarId) {
-        viewModel.fetchBazarDetail(bazarId)
+    // Cek autentikasi saat komponen dimuat
+    LaunchedEffect(Unit) {
+        val token = userPreferences.getToken(context)
+        isAuthenticated = !token.isNullOrEmpty()
+
+        if (isAuthenticated) {
+            viewModel.fetchBazarDetail(bazarId)
+        }
     }
 
     Scaffold(
@@ -60,7 +95,36 @@ fun BazarDetailScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if (isLoading) {
+            if (!isAuthenticated) {
+                // Tampilan untuk user yang belum login
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Unauthorized. Silakan login kembali",
+                        color = Color.Red,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            context.startActivity(
+                                Intent(context, LoginActivity::class.java)
+                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.primary
+                        )
+                    ) {
+                        Text("Login", color = Color.White)
+                    }
+                }
+            } else if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -71,11 +135,20 @@ fun BazarDetailScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = error ?: "Terjadi kesalahan",
                         color = Color.Red
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                viewModel.fetchBazarDetail(bazarId)
+                            }
+                        }
+                    ) {
+                        Text("Coba Lagi")
+                    }
                 }
             } else {
                 bazarDetail?.let { bazar ->

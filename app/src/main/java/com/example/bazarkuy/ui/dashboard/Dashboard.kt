@@ -1,6 +1,9 @@
+
+
 package com.example.bazarkuy.ui.dashboard
 
 import DashboardViewModel
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.compose.foundation.Image
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import com.example.bazarkuy.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.Composable
@@ -39,50 +43,52 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.bazarkuy.ui.Navigation.CustomBottomNavigation
 import com.example.bazarkuy.ui.Navigation.SetupNavGraph
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.example.bazarkuy.ui.Navigation.Screen
+import androidx.compose.foundation.clickable
+import com.example.bazarkuy.ui.BazarDetailScreen
+
 
 class Dashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colors.background
-            ) {
-            @Composable
-            fun DashboardActivity() {
-                val navController = rememberNavController()
+            val navController = rememberNavController()
 
-                Scaffold(
-                    bottomBar = {
-                        CustomBottomNavigation(navController = navController)
-                    }
-                ) { paddingValues ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                    ) {
-                        SetupNavGraph(navController = navController)
-                    }
+            NavHost(
+                navController = navController,
+                startDestination = "dashboard"
+            ) {
+                composable("dashboard") {
+                    DashboardScreen(
+                        onBazarClick = { bazarId ->
+                            navController.navigate("bazarDetail/$bazarId")
+                        }
+                    )
                 }
-            }
+                composable(
+                    "bazarDetail/{bazarId}",
+                    arguments = listOf(navArgument("bazarId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val bazarId = backStackEntry.arguments?.getInt("bazarId") ?: return@composable
+                    BazarDetailScreen(
+                        bazarId = bazarId,
+                        onBackClick = { navController.navigateUp() }
+                    )
+                }
             }
         }
     }
-
+}
 //    private fun navigateToBazarDetail(role: String) {
 //        intent.putExtra("USER_ROLE", role) // Kirim role ke Dashboard
 //        startActivity(Intent(this, BazarDetail::class.java))
 //        finish() // Hentikan LoginActivity
 //    }
 
-
-}
-
-
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
-    // Memanggil fetch data saat pertama kali screen di-load
+fun DashboardScreen(viewModel: DashboardViewModel = viewModel(), onBazarClick: (Int) -> Unit) { // tambahkan parameter onBazarClick
     LaunchedEffect(Unit) {
         viewModel.fetchBazaars()
     }
@@ -118,7 +124,10 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
             style = TextStyle(fontSize = 20.sp, color = Color.Black, letterSpacing = 1.2.sp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        OngoingBazaarSlider(bazaars = ongoingBazaars)
+        OngoingBazaarSlider(
+            bazaars = ongoingBazaars,
+            onBazarClick = onBazarClick  // tambahkan ini
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Coming Soon Bazaar
@@ -127,17 +136,16 @@ fun DashboardScreen(viewModel: DashboardViewModel = viewModel()) {
             style = TextStyle(fontSize = 20.sp, color = Color.Black, letterSpacing = 1.2.sp)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        ComingSoonBazaarList(bazaars = comingSoonBazaars)
+        ComingSoonBazaarList(
+            bazaars = comingSoonBazaars,
+            onBazarClick = onBazarClick  // tambahkan ini
+        )
         Spacer(modifier = Modifier.height(16.dp))
-
-
-
     }
-
 }
 
 @Composable
-fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
+fun OngoingBazaarSlider(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
     println("Rendering OngoingBazaarSlider with ${bazaars.size} bazaars") // Tambahkan logging
 
     if (bazaars.isEmpty()) {
@@ -153,6 +161,7 @@ fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
                     modifier = Modifier
                         .padding(8.dp)
                         .size(250.dp, 150.dp)
+                        .clickable { onBazarClick(bazar.id) }
                 ) {
                     Box {
 
@@ -194,7 +203,7 @@ fun OngoingBazaarSlider(bazaars: List<BazarResponse>) {
 }
 
 @Composable
-fun ComingSoonBazaarList(bazaars: List<BazarResponse>) {
+fun ComingSoonBazaarList(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
     println("Rendering ComingSoonBazaarList with ${bazaars.size} bazaars") // Tambahkan logging
 
     if (bazaars.isEmpty()) {
@@ -209,6 +218,7 @@ fun ComingSoonBazaarList(bazaars: List<BazarResponse>) {
                         .background(Color(0xFFEEEEEE), RoundedCornerShape(16.dp))
                         .fillMaxWidth()
                         .padding(16.dp)
+                        .clickable { onBazarClick(bazar.id) }
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.bazaar_image),

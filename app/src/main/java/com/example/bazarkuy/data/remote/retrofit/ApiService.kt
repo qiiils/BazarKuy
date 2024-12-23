@@ -47,7 +47,7 @@ interface ApiService {
     suspend fun getComingSoonBazaars(): Response<List<BazarResponse>>  // Ubah ke List langsung
 
     @GET("/api/bazars/{id}")
-    suspend fun getBazarDetail(@Path("id") bazarId: Int): Response<BazarDetailResponse>
+    suspend fun getBazarDetail(@Path("id") bazarId: Int): BazarDetailResponse
 }
 
 // Response wrapper
