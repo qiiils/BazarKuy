@@ -22,29 +22,47 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.Text
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.bazarkuy.ProfileScreen
 import com.example.bazarkuy.R
 
+val Poppins = FontFamily(
+    Font(R.font.poppins_semibold)
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
         setContent {
             SplashScreen(onTimeout = {
                 // Menavigasi ke LoginActivity setelah Splash Screen selesai
                 startActivity(Intent(this, WelcomeActivity::class.java))
                 finish() // Menutup MainActivity setelah pindah ke LoginActivity
             })
-            
+        }
+        setContent {
+            val navController = rememberNavController()
+            NavGraph(navController)
         }
     }
 }
 
-val Poppins = FontFamily(
-    Font(R.font.poppins_semibold)  // Pastikan nama file font sesuai dengan yang ada di res/font
-)
 
+@Composable
+fun NavGraph(navController: NavHostController) {
+    NavHost(
+        navController = navController,
+        startDestination = "profile"
+    ) {
+        composable("editProfile") {
+            EditProfileScreen(navController)
+        }
+    }
+}
 
 @Composable
 fun SplashScreen(onTimeout: () -> Unit) {
