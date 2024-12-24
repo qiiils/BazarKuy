@@ -1,5 +1,5 @@
 //EditprofileScreen.kt
-package com.example.bazarkuy.ui
+package com.example.bazarkuy.ui.Profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
