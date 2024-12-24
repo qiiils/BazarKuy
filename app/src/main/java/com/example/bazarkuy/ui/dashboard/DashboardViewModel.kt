@@ -24,6 +24,9 @@ class DashboardViewModel(private val context: Context) : ViewModel() {
     private val _error = mutableStateOf<String?>(null)
     val error: State<String?> = _error
 
+    private val _applyNowBazaars = mutableStateOf<List<BazarResponse>>(emptyList())
+    val applyNowBazaars: State<List<BazarResponse>> = _applyNowBazaars
+
     init {
         viewModelScope.launch {
             apiService = ApiConfig.getApiService(context)
@@ -45,6 +48,11 @@ class DashboardViewModel(private val context: Context) : ViewModel() {
                     _comingSoonBazaars.value = comingSoonResponse.body() ?: emptyList()
                 } else {
                     _error.value = "Failed to fetch upcoming bazaars: ${comingSoonResponse.code()}"
+                }
+
+                val applyNowResponse = apiService.getOpenBazaars(token = token)
+                if (applyNowResponse.isSuccessful) {
+                    _applyNowBazaars.value = applyNowResponse.body() ?: emptyList()
                 }
             } catch (e: Exception) {
                 _error.value = "Network error: ${e.message}"

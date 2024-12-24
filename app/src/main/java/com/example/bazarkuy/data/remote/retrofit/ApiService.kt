@@ -50,6 +50,11 @@ interface ApiService {
         @Header("Authorization") token: String // Tambahkan header token
     ): Response<List<BazarResponse>>
 
+    @GET("/api/bazars/open")
+    suspend fun getOpenBazaars(
+        @Header("Authorization") token: String // Tambahkan header token
+    ): Response<List<BazarResponse>>
+
     // Fetch all bazaars
     @GET("api/bazars")
     suspend fun getAllBazars(

@@ -157,6 +157,7 @@ fun BazarDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+
                         // Title
                         Text(
                             text = bazar.name,
@@ -190,13 +191,19 @@ fun BazarDetailScreen(
                         DetailItem("Status", bazar.status)
 
                         Spacer(modifier = Modifier.height(24.dp))
-
-                        // Apply Button
                         Button(
                             onClick = { /* TODO: Handle registration */ },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = bazar.status.equals("open", ignoreCase = true)
                         ) {
-                            Text("Daftar Sekarang")
+                            Text(
+                                text = when (bazar.status.toLowerCase()) {
+                                    "open" -> "Daftar Sekarang"
+                                    "ongoing" -> "Pendaftaran Ditutup"
+                                    "completed" -> "Event Selesai"
+                                    else -> "Belum Dibuka"
+                                }
+                            )
                         }
                     }
                 }

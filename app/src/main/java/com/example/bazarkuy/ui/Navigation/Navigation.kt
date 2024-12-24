@@ -28,10 +28,10 @@ data class BottomNavItem(
 fun CustomBottomNavigation(
     navController: NavController,
     items: List<BottomNavItem> = listOf(
-        BottomNavItem("Home", "home", R.drawable.ic_home),
-        BottomNavItem("History", "history", R.drawable.ic_history),
-        BottomNavItem("Notifications", "notifications", R.drawable.ic_notifications),
-        BottomNavItem("Profile", "profile", R.drawable.ic_profile)
+        BottomNavItem("Home", Screen.Dashboard.route, R.drawable.ic_home),
+        BottomNavItem("History", Screen.History.route, R.drawable.ic_history),
+        BottomNavItem("Notifications", Screen.Notifications.route, R.drawable.ic_notifications),
+        BottomNavItem("Profile", Screen.Profile.route, R.drawable.ic_profile)
     )
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -75,14 +75,14 @@ fun CustomBottomNavigation(
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.name,
-                            tint = if (selected) Color(0xFF4B6BFF) else Color.Gray,
+                            tint = if (selected) Color(0xFF5D72E9) else Color.Gray,
                             modifier = Modifier.size(24.dp)
                         )
                         if (selected) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = item.name,
-                                color = Color(0xFF4B6BFF),
+                                color = Color(0xFF5D72E9),
                                 style = MaterialTheme.typography.labelSmall,
                                 textAlign = TextAlign.Center
                             )
