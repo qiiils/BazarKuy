@@ -26,29 +26,43 @@ import retrofit2.http.Query
 
 
 interface ApiService {
+
+    // Login
     @Headers("Content-Type: application/json")
     @POST("/api/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-//    @FormUrlEncoded
+    // Register
     @Headers("Content-Type: application/json")
     @POST("/api/auth/register")
-    suspend fun register(
-        @Body request: RegisterRequest
-    ): Response<RegisterResponse>
+    suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 
-//    @GET("/api/bazars")
-//    suspend fun getBazaars(): List<BazarResponse>
-
+    // Fetch all ongoing bazaars
     @GET("/api/bazars/ongoing")
-    suspend fun getOngoingBazaars(): Response<List<BazarResponse>>  // Ubah ke List langsung
+    suspend fun getOngoingBazaars(
+        @Header("Authorization") token: String // Tambahkan header token
+    ): Response<List<BazarResponse>>
 
+    // Fetch all coming-soon bazaars
     @GET("/api/bazars/coming-soon")
-    suspend fun getComingSoonBazaars(): Response<List<BazarResponse>>  // Ubah ke List langsung
+    suspend fun getComingSoonBazaars(
+        @Header("Authorization") token: String // Tambahkan header token
+    ): Response<List<BazarResponse>>
 
-    @GET("/api/bazars/{id}")
-    suspend fun getBazarDetail(@Path("id") bazarId: Int): BazarDetailResponse
+    // Fetch all bazaars
+    @GET("api/bazars")
+    suspend fun getAllBazars(
+        @Header("Authorization") token: String // Tambahkan header token
+    ): Response<List<BazarResponse>>
+
+    // Fetch bazar detail by ID
+    @GET("api/bazars/{id}")
+    suspend fun getBazarDetail(
+        @Path("id") id: Int,
+        @Header("Authorization") token: String // Tambahkan header token
+    ): Response<BazarDetailResponse>
 }
+
 
 // Response wrapper
 data class BazarListResponse(

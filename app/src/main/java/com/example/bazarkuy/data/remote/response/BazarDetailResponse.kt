@@ -2,48 +2,57 @@ package com.example.bazarkuy.data.remote.response
 
 import com.google.gson.annotations.SerializedName
 
-    data class BazarDetailResponse(
-        @SerializedName("id")
-        val id: Int,
+data class BazarDetailResponse(
+    @SerializedName("id")
+    val id: Int,
 
-        @SerializedName("name")
-        val name: String,
+    @SerializedName("name")
+    val name: String,
 
-        @SerializedName("description")
-        val description: String,
+    @SerializedName("description")
+    val description: String,
 
-        @SerializedName("eventDate")
-        val eventDate: String,
+    @SerializedName("startEventDate")
+    val startEventDate: String,
 
-        @SerializedName("registrationStartDate")
-        val registrationStartDate: String,
+    @SerializedName("endEventDate")
+    val endEventDate: String,
 
-        @SerializedName("registrationEndDate")
-        val registrationEndDate: String,
+    @SerializedName("registrationStartDate")
+    val registrationStartDate: String,
 
-        @SerializedName("location")
-        val location: String,
+    @SerializedName("registrationEndDate")
+    val registrationEndDate: String,
 
-        @SerializedName("termsAndConditions")
-        val termsAndConditions: String,
+    @SerializedName("location")
+    val location: String,
 
-        @SerializedName("status")
-        val status: String,
+    @SerializedName("termsAndConditions")
+    val termsAndConditions: String,
 
-        @SerializedName("organizerId")
-        val organizerId: Int,
+    @SerializedName("status")
+    val status: String,
 
-        @SerializedName("createdAt")
-        val createdAt: String,
+    @SerializedName("organizerId")
+    val organizerId: Int,
 
-        @SerializedName("updatedAt")
-        val updatedAt: String,
+    @SerializedName("imageUrl")
+    val imageUrl: String?,
 
-        @SerializedName("organizer")
-        val organizer: OrganizerResponse
-    )
+    @SerializedName("createdAt")
+    val createdAt: String,
 
-    data class OrganizerResponse(
-        @SerializedName("name")
-        val name: String
-    )
+    @SerializedName("updatedAt")
+    val updatedAt: String,
+
+    @SerializedName("organizer")
+    val organizer: Organizer
+)
+
+data class Organizer(
+    @SerializedName("name")
+    val name: String,
+
+    @SerializedName("email")
+    val email: String
+)

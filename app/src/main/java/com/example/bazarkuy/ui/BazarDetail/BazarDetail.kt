@@ -1,300 +1,181 @@
-package com.example.bazarkuy.ui
+package com.example.bazarkuy.ui.BazarDetail
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.bazarkuy.R
-import com.example.bazarkuy.ui.bazardetail.BazarDetailViewModel
-import java.text.SimpleDateFormat
-import java.util.*
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.bazarkuy.R
+import com.example.bazarkuy.data.remote.response.BazarDetailResponse
+import com.example.bazarkuy.data.remote.retrofit.ApiConfig
+import com.example.bazarkuy.data.remote.retrofit.ApiService
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.example.bazarkuy.data.local.UserPreferences
-import com.example.bazarkuy.ui.login.LoginActivity
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
-class BazarDetailActivity : ComponentActivity() {
+
+class BazarDetail : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val bazarId = intent.getIntExtra("BAZAR_ID", -1)
         setContent {
-            BazarDetailScreen(
-                bazarId = bazarId,
-                onBackClick = { finish() }
-            )
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                BazarDetailScreen(
+                    bazarId = intent.getIntExtra("bazarId", 0),
+                    onBackClick = { finish() }
+                )
+            }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BazarDetailScreen(
     bazarId: Int,
-    onBackClick: () -> Unit,
-    viewModel: BazarDetailViewModel = viewModel()
+    onBackClick: () -> Unit
 ) {
-    val context = LocalContext.current
-    val userPreferences = remember { UserPreferences() }
-    var isAuthenticated by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-
+    val viewModel: BazarDetailViewModel = viewModel()
     val bazarDetail by viewModel.bazarDetail
     val isLoading by viewModel.isLoading
     val error by viewModel.error
 
-    // Cek autentikasi saat komponen dimuat
-    LaunchedEffect(Unit) {
-        val token = userPreferences.getToken(context)
-        isAuthenticated = !token.isNullOrEmpty()
-
-        if (isAuthenticated) {
-            viewModel.fetchBazarDetail(bazarId)
-        }
+    // Fetch data when composable is first launched
+    LaunchedEffect(bazarId) {
+        viewModel.fetchBazarDetail(bazarId, LocalContext.current)
     }
-
     Scaffold(
         topBar = {
-            TopAppBar(
+            SmallTopAppBar(
                 title = { Text("Detail Bazar") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, "Back")
                     }
-                },
-                backgroundColor = MaterialTheme.colors.primary,
-                contentColor = Color.White
+                }
             )
         }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
         ) {
-            if (!isAuthenticated) {
-                // Tampilan untuk user yang belum login
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Unauthorized. Silakan login kembali",
-                        color = Color.Red,
-                        fontSize = 16.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            context.startActivity(
-                                Intent(context, LoginActivity::class.java)
-                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            )
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = MaterialTheme.colors.primary
-                        )
+            when {
+                isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text("Login", color = Color.White)
+                        CircularProgressIndicator()
                     }
                 }
-            } else if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else if (error != null) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = error ?: "Terjadi kesalahan",
-                        color = Color.Red
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            coroutineScope.launch {
-                                viewModel.fetchBazarDetail(bazarId)
-                            }
-                        }
-                    ) {
-                        Text("Coba Lagi")
-                    }
-                }
-            } else {
-                bazarDetail?.let { bazar ->
-                    Column(
+                error != null -> {
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        // Banner Image
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.bazaar_image),
-                                contentDescription = "Bazar Banner",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
+                        Text(
+                            text = error ?: "Unknown error occurred",
+                            color = Color.Red
+                        )
+                    }
+                }
+                bazarDetail != null -> {
+                    val bazar = bazarDetail!!
 
-                        // Main Content
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            // Title Section
-                            Text(
-                                text = bazar.name,
+                    // Banner Image
+                    Image(
+                        painter = painterResource(id = R.drawable.bazaar_image),
+                        contentDescription = "Bazar Banner",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    // Content
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        // Title
+                        Text(
+                            text = bazar.name,
+                            style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                            // Status Chip
-                            Surface(
-                                color = when (bazar.status.lowercase()) {
-                                    "ongoing" -> Color(0xFF4CAF50)
-                                    "draft" -> Color(0xFF2196F3)
-                                    "completed" -> Color(0xFF9E9E9E)
-                                    "cancelled" -> Color(0xFFE57373)
-                                    else -> Color.Gray
-                                },
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Text(
-                                    text = when (bazar.status.lowercase()) {
-                                        "ongoing" -> "Sedang Berlangsung"
-                                        "draft" -> "Akan Datang"
-                                        "completed" -> "Selesai"
-                                        "cancelled" -> "Dibatalkan"
-                                        else -> "Status Tidak Diketahui"
-                                    },
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                                )
-                            }
+                        // Description
+                        Text(
+                            text = bazar.description,
+                            style = TextStyle(fontSize = 16.sp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Divider()
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Info Section
-                            DetailSection(
-                                title = "Informasi Bazar",
-                                items = listOf(
-                                    DetailItem(
-                                        icon = Icons.Default.DateRange,
-                                        label = "Tanggal Acara",
-                                        value = formatDate(bazar.eventDate)
-                                    ),
-                                    DetailItem(
-                                        icon = Icons.Default.LocationOn,
-                                        label = "Lokasi",
-                                        value = bazar.location
-                                    ),
-                                    DetailItem(
-                                        icon = Icons.Default.Person,
-                                        label = "Penyelenggara",
-                                        value = bazar.organizer.name
-                                    )
-                                )
+                        // Details
+                        Text(
+                            text = "Detail",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
                             )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DetailItem("Lokasi", bazar.location)
+                        DetailItem("Tanggal Event", "${bazar.startEventDate} - ${bazar.endEventDate}")
+                        DetailItem("Periode Registrasi", "${bazar.registrationStartDate} - ${bazar.registrationEndDate}")
+                        DetailItem("Status", bazar.status)
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                            // Registration Period
-                            DetailSection(
-                                title = "Periode Pendaftaran",
-                                items = listOf(
-                                    DetailItem(
-                                        icon = Icons.Default.DateRange,
-                                        label = "Mulai Pendaftaran",
-                                        value = formatDate(bazar.registrationStartDate)
-                                    ),
-                                    DetailItem(
-                                        icon = Icons.Default.DateRange,
-                                        label = "Akhir Pendaftaran",
-                                        value = formatDate(bazar.registrationEndDate)
-                                    )
-                                )
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Terms and Conditions
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                elevation = 4.dp,
-                                shape = RoundedCornerShape(8.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
-                                ) {
-                                    Text(
-                                        text = "Syarat dan Ketentuan",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = bazar.termsAndConditions,
-                                        color = Color.Gray
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            // Apply Button
-                            Button(
-                                onClick = { /* Handle registration */ },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = MaterialTheme.colors.primary
-                                )
-                            ) {
-                                Text(
-                                    "Daftar Sekarang",
-                                    color = Color.White
-                                )
-                            }
+                        // Apply Button
+                        Button(
+                            onClick = { /* TODO: Handle registration */ },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Daftar Sekarang")
                         }
                     }
                 }
@@ -304,72 +185,94 @@ fun BazarDetailScreen(
 }
 
 @Composable
-private fun DetailSection(
-    title: String,
-    items: List<DetailItem>
+private fun DetailItem(
+    label: String,
+    value: String
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = 4.dp,
-        shape = RoundedCornerShape(8.dp)
+    Column(
+        modifier = Modifier.padding(vertical = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+        Text(
+            text = label,
+            style = TextStyle(
+                fontSize = 14.sp,
+                color = Color.Gray
             )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            items.forEach { item ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.primary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Column {
-                        Text(
-                            text = item.label,
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = item.value,
-                            fontSize = 16.sp
-                        )
-                    }
-                }
-                if (items.last() != item) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
-        }
+        )
+        Text(
+            text = value,
+            style = TextStyle(fontSize = 16.sp)
+        )
     }
 }
 
-data class DetailItem(
-    val icon: ImageVector,
-    val label: String,
-    val value: String
-)
+@Composable
+fun UMKMCard(
+    name: String,
+    category: String,
+    imageRes: Int
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { },
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = name,
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
 
-private fun formatDate(dateString: String): String {
-    return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale("id"))
-        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-        val date = inputFormat.parse(dateString)
-        outputFormat.format(date)
-    } catch (e: Exception) {
-        dateString
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp)
+            ) {
+                Text(
+                    text = name,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                )
+                Text(
+                    text = category,
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "View Detail",
+                tint = Color.Gray
+            )
+        }
     }
+}
+@Preview(
+    name = "Bazar Detail Screen",
+    showBackground = true,
+    showSystemUi = true,
+    device = Devices.PIXEL_4
+)
+@Composable
+fun BazarDetailScreenPreview() {
+    BazarDetailScreen(
+        bazarId = 1,
+        onBackClick = {}
+    )
 }

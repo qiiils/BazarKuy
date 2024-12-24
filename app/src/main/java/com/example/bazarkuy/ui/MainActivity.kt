@@ -44,10 +44,6 @@ class MainActivity : ComponentActivity() {
                 finish() // Menutup MainActivity setelah pindah ke LoginActivity
             })
         }
-        setContent {
-            val navController = rememberNavController()
-            NavGraph(navController)
-        }
     }
 }
 

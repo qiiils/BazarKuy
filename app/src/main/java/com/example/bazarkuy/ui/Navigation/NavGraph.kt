@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.bazarkuy.ui.BazarDetailScreen
+import com.example.bazarkuy.ui.BazarDetail.BazarDetailScreen
 import com.example.bazarkuy.ui.dashboard.DashboardScreen
 //import com.example.bazarkuy.ui.history.HistoryScreen
 //import com.example.bazarkuy.ui.notifications.NotificationsScreen
@@ -21,6 +21,7 @@ sealed class NavRoutes(val route: String) {
         fun createRoute(bazarId: Int) = "bazar_detail/$bazarId"
     }
 }
+
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {

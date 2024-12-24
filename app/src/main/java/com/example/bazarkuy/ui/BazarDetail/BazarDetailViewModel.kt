@@ -1,11 +1,13 @@
-package com.example.bazarkuy.ui.bazardetail
+package com.example.bazarkuy.ui.BazarDetail
 
+import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.retrofit.ApiConfig
+import com.example.bazarkuy.data.remote.retrofit.ApiService
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
@@ -19,26 +21,15 @@ class BazarDetailViewModel : ViewModel() {
     private val _error = mutableStateOf<String?>(null)
     val error: State<String?> = _error
 
-    fun fetchBazarDetail(bazarId: Int) {
+    fun fetchBazarDetail(bazarId: Int, context: Context) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                println("Fetching bazar detail for ID: $bazarId") // Debug log
-                val response = ApiConfig.apiService.getBazarDetail(bazarId)
-                println("Response received: $response") // Debug log
+                val apiService = ApiConfig.getApiService(context)
+                val response = ApiService.getBazarDetail(bazarId)
                 _bazarDetail.value = response
-                _error.value = null
             } catch (e: HttpException) {
-                println("HTTP Error: ${e.code()} - ${e.message()}") // Debug log
-                when (e.code()) {
-                    401 -> _error.value = "Unauthorized: Silakan login kembali"
-                    403 -> _error.value = "Forbidden: Anda tidak memiliki akses"
-                    404 -> _error.value = "Bazar tidak ditemukan"
-                    else -> _error.value = "Error: ${e.message()}"
-                }
-            } catch (e: Exception) {
-                println("General Error: ${e.message}") // Debug log
-                _error.value = "Network error: ${e.message}"
+                _error.value = "Error: ${e.message}"
             } finally {
                 _isLoading.value = false
             }

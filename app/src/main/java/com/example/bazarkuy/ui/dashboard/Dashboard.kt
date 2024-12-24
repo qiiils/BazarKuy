@@ -47,36 +47,16 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.bazarkuy.ui.Navigation.Screen
 import androidx.compose.foundation.clickable
-import com.example.bazarkuy.ui.BazarDetailScreen
+import com.example.bazarkuy.ui.BazarDetail.BazarDetailScreen
 
 
 class Dashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-
-            NavHost(
-                navController = navController,
-                startDestination = "dashboard"
-            ) {
-                composable("dashboard") {
-                    DashboardScreen(
-                        onBazarClick = { bazarId ->
-                            navController.navigate("bazarDetail/$bazarId")
-                        }
-                    )
-                }
-                composable(
-                    "bazarDetail/{bazarId}",
-                    arguments = listOf(navArgument("bazarId") { type = NavType.IntType })
-                ) { backStackEntry ->
-                    val bazarId = backStackEntry.arguments?.getInt("bazarId") ?: return@composable
-                    BazarDetailScreen(
-                        bazarId = bazarId,
-                        onBackClick = { navController.navigateUp() }
-                    )
-                }
+            Surface(modifier = Modifier.fillMaxSize()) {
+                val navController = rememberNavController()
+                SetupNavGraph(navController = navController)
             }
         }
     }

@@ -32,7 +32,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             LoginScreen(
                 onLoginClick = { email, password ->
-                    viewModel.login(email, password)
+                    viewModel.login(email, password, this)
                 },
                 onSignUpClick = { navigateToRegister() }
             )

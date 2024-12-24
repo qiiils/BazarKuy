@@ -24,8 +24,6 @@
         <activity android:name=".ui.login.LoginActivity" />
         <activity android:name=".ui.signUp.RegisterActivity" />
         <activity android:name=".ui.ForgotPasswordActivity" />
-        <activity android:name=".ui.dashboard.Dashboard" />
-
         <!-- Main Activity dengan intent filter -->
         <activity
             android:name=".ui.MainActivity"
@@ -35,6 +33,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.dashboard.Dashboard"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.BazarDetail.BazarDetail"
+            android:exported="false" />
+
     </application>
 
 </manifest>
