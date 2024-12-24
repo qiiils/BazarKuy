@@ -58,15 +58,20 @@ class Dashboard : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
             Surface(modifier = Modifier.fillMaxSize()) {
-                DashboardScreen(
-                    viewModel = viewModel,
-                    onBazarClick = { bazarId ->
-                        val intent = Intent(this@Dashboard, BazarDetail::class.java)
-                        intent.putExtra("bazarId", bazarId)
-                        startActivity(intent)
+                Scaffold(
+                    bottomBar = {
+                        CustomBottomNavigation(navController = navController)
                     }
-                )
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        SetupNavGraph(
+                            navController = navController,
+                            dashboardViewModel = viewModel
+                        )
+                    }
+                }
             }
         }
     }
@@ -77,11 +82,11 @@ class Dashboard : ComponentActivity() {
 //        finish() // Hentikan LoginActivity
 //    }
 
-    @Composable
-    fun DashboardScreen(
-        viewModel: DashboardViewModel = viewModel(),
-        onBazarClick: (Int) -> Unit
-    ) { // tambahkan parameter onBazarClick
+@Composable
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    onBazarClick: (Int) -> Unit
+) { // tambahkan parameter onBazarClick
         LaunchedEffect(Unit) {
             viewModel.fetchBazaars()
         }
@@ -137,9 +142,9 @@ class Dashboard : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun OngoingBazaarSlider(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
-        println("Rendering OngoingBazaarSlider with ${bazaars.size} bazaars") // Tambahkan logging
+@Composable
+fun OngoingBazaarSlider(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
+    println("Rendering OngoingBazaarSlider with ${bazaars.size} bazaars") // Tambahkan logging
 
         if (bazaars.isEmpty()) {
             Text(text = "No ongoing bazaars available", color = Color.Gray)
@@ -195,9 +200,9 @@ class Dashboard : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun ComingSoonBazaarList(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
-        println("Rendering ComingSoonBazaarList with ${bazaars.size} bazaars") // Tambahkan logging
+@Composable
+fun ComingSoonBazaarList(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
+    println("Rendering ComingSoonBazaarList with ${bazaars.size} bazaars") // Tambahkan logging
 
         if (bazaars.isEmpty()) {
             Text(text = "No upcoming bazaars available", color = Color.Gray)
