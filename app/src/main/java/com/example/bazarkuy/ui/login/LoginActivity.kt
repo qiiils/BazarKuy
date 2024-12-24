@@ -24,9 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bazarkuy.ui.dashboard.Dashboard
 import com.example.bazarkuy.ui.signUp.RegisterActivity
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.bazarkuy.data.remote.response.LoginResponse
+import com.example.bazarkuy.data.remote.response.LoginRequest
 
 class LoginActivity : ComponentActivity() {
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel by viewModels<LoginViewModel> { LoginViewModelFactory(application) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

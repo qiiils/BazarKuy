@@ -1,4 +1,5 @@
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,17 +21,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 _loginState.value = LoginState.Loading
-
-                // Gunakan getApplication() untuk context
                 val response = ApiConfig.getApiService(getApplication()).login(
                     LoginRequest(email, password)
                 )
 
                 if (response.isSuccessful) {
-                    val loginResponse = response.body()!!
-                    // Simpan token dengan getApplication()
-                    userPreferences.saveToken(getApplication(), loginResponse.token ?: "")
-                    _loginState.value = LoginState.Success(loginResponse)
+                    response.body()?.let { loginResponse ->
+                        userPreferences.saveToken(getApplication(), loginResponse.token ?: "")
+                        _loginState.value = LoginState.Success(loginResponse)
+                    }
                 } else {
                     _loginState.value = LoginState.Error(response.message())
                 }
@@ -39,7 +38,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
 }
 
 sealed class LoginState {

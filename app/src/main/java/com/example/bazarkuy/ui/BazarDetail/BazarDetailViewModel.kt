@@ -1,6 +1,7 @@
 package com.example.bazarkuy.ui.BazarDetail
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -37,11 +38,14 @@ class BazarDetailViewModel(private val context: Context) : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                _isLoading.value = true
                 // Buat instance ApiService melalui ApiConfig
                 val apiService = ApiConfig.getApiService(context)
+                val token = UserPreferences().getToken(context)
+                Log.d("BazarDetailViewModel", "Token: $token")
 
                 // Panggil endpoint getBazarDetail
-                val response = apiService.getBazarDetail(id, token = token)
+                val response = apiService.getBazarDetail(id, "Bearer $token")
                 if (response.isSuccessful) {
                     _bazarDetail.value = response.body()
                     _error.value = null
