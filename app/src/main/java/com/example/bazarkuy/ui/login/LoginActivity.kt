@@ -53,8 +53,7 @@ class LoginActivity : ComponentActivity() {
                 }
                 is LoginState.Success -> {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, Dashboard::class.java))
-                    finish()
+                    navigateToDashboard(state.data.user.role)
                 }
                 is LoginState.Error -> {
                     Toast.makeText(this, "Error: ${state.message}", Toast.LENGTH_SHORT).show()

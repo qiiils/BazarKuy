@@ -5,6 +5,7 @@ import DashboardViewModelFactory
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -49,7 +50,11 @@ import com.example.bazarkuy.ui.Navigation.Screen
 import androidx.compose.foundation.clickable
 import com.example.bazarkuy.ui.BazarDetail.BazarDetail
 import com.example.bazarkuy.ui.BazarDetail.BazarDetailScreen
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.FabPosition
 
 // Dashboard.kt
 class Dashboard : ComponentActivity() {
@@ -57,15 +62,51 @@ class Dashboard : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val userRole = intent.getStringExtra("USER_ROLE")
+
+        Log.d("Dashboard", "User Role: $userRole")
+
         setContent {
             val navController = rememberNavController()
             Surface(modifier = Modifier.fillMaxSize()) {
+                var showDebugRole by remember { mutableStateOf(false) }
+
                 Scaffold(
                     bottomBar = {
                         CustomBottomNavigation(navController = navController)
-                    }
+                    },
+                    floatingActionButton = {
+                        Log.d("Dashboard", "Checking FAB condition. Is Penyelenggara? ${userRole == "Penyelenggara Bazar"}")
+
+                        if (userRole == "Penyelenggara Bazar") {
+                            FloatingActionButton(
+                                onClick = {
+                                    // Navigate to AddBazarForm
+//                                    startActivity(Intent(this@Dashboard, AddBazarForm::class.java))
+                                },
+                                containerColor = Color(0xFF4B6BFF),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add Bazar",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.End
                 ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
+                        if (showDebugRole) {
+                            Text(
+                                text = "Current Role: $userRole",
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(8.dp)
+                            )
+                        }
+
                         SetupNavGraph(
                             navController = navController,
                             dashboardViewModel = viewModel
@@ -99,7 +140,7 @@ fun DashboardScreen(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB))
+                        colors = listOf(Color.White)
                     )
                 )
                 .padding(16.dp)
