@@ -1,5 +1,6 @@
 package com.example.bazarkuy.ui.Navigation
 
+import DashboardViewModel
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -8,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.bazarkuy.ui.BazarDetail.BazarDetailScreen
 import com.example.bazarkuy.ui.dashboard.DashboardScreen
+
 //import com.example.bazarkuy.ui.history.HistoryScreen
 //import com.example.bazarkuy.ui.notifications.NotificationsScreen
 //import com.example.bazarkuy.ui.profile.ProfileScreen
@@ -24,13 +26,19 @@ sealed class NavRoutes(val route: String) {
 
 
 @Composable
-fun SetupNavGraph(navController: NavHostController) {
+fun SetupNavGraph(
+    navController: NavHostController,
+    dashboardViewModel: DashboardViewModel
+
+) {
     NavHost(
         navController = navController,
         startDestination = Screen.Dashboard.route
+
     ) {
         composable(Screen.Dashboard.route) {
             DashboardScreen(
+                viewModel = dashboardViewModel,
                 onBazarClick = { bazarId ->
                     navController.navigate(Screen.BazarDetail.createRoute(bazarId))
                 }
@@ -49,7 +57,6 @@ fun SetupNavGraph(navController: NavHostController) {
         }
     }
 }
-
         // Other Routes
 //        composable(NavRoutes.History.route) {
 //            HistoryScreen()

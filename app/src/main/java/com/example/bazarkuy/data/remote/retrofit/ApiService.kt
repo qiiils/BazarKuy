@@ -8,6 +8,7 @@ import com.example.bazarkuy.data.remote.response.LoginRequest
 import com.example.bazarkuy.data.remote.response.LoginResponse
 import com.example.bazarkuy.data.remote.response.RegisterRequest
 import com.example.bazarkuy.data.remote.response.RegisterResponse
+import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -61,6 +62,7 @@ interface ApiService {
         @Path("id") id: Int,
         @Header("Authorization") token: String // Tambahkan header token
     ): Response<BazarDetailResponse>
+
 }
 
 

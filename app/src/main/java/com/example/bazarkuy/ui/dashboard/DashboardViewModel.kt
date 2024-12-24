@@ -1,15 +1,22 @@
+import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.bazarkuy.data.local.UserPreferences
 import com.example.bazarkuy.data.remote.response.BazarResponse
 import com.example.bazarkuy.data.remote.retrofit.ApiConfig
+import com.example.bazarkuy.data.remote.retrofit.ApiService
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import retrofit2.awaitResponse
 
-class DashboardViewModel : ViewModel() {
+class DashboardViewModel(private val context: Context) : ViewModel() {
+    private lateinit var apiService: ApiService
     private val _ongoingBazaars = mutableStateOf<List<BazarResponse>>(emptyList())
     val ongoingBazaars: State<List<BazarResponse>> = _ongoingBazaars
+    val token = runBlocking { UserPreferences().getToken(context) ?: "" }
 
     private val _comingSoonBazaars = mutableStateOf<List<BazarResponse>>(emptyList())
     val comingSoonBazaars: State<List<BazarResponse>> = _comingSoonBazaars
@@ -17,44 +24,37 @@ class DashboardViewModel : ViewModel() {
     private val _error = mutableStateOf<String?>(null)
     val error: State<String?> = _error
 
+    init {
+        viewModelScope.launch {
+            apiService = ApiConfig.getApiService(context)
+        }
+    }
+
     fun fetchBazaars() {
-        println("Mulai fetch bazaars")
         viewModelScope.launch {
             try {
-                // Mengambil ongoing bazaars
-                println("Mencoba mengambil ongoing bazaars...")
-                val ongoingResponse = ApiConfig.apiService.getOngoingBazaars()
-                println("Ongoing Response Code: ${ongoingResponse.code()}")
-                println("Ongoing Response Body: ${ongoingResponse.body()}")
-
+                val ongoingResponse = apiService.getOngoingBazaars(token = token)
                 if (ongoingResponse.isSuccessful) {
-                    val bazaarList = ongoingResponse.body()
-                    println("Ongoing Bazaars received: $bazaarList")
-                    _ongoingBazaars.value = bazaarList ?: emptyList()
+                    _ongoingBazaars.value = ongoingResponse.body() ?: emptyList()
                 } else {
-                    println("Ongoing Error: ${ongoingResponse.errorBody()?.string()}")
-                    _error.value = "Gagal mengambil data bazaar yang sedang berlangsung: ${ongoingResponse.code()}"
+                    _error.value = "Failed to fetch ongoing bazaars: ${ongoingResponse.code()}"
                 }
 
-                // Mengambil coming soon bazaars
-                println("Mencoba mengambil coming soon bazaars...")
-                val comingSoonResponse = ApiConfig.apiService.getComingSoonBazaars()
-                println("Coming Soon Response Code: ${comingSoonResponse.code()}")
-                println("Coming Soon Response Body: ${comingSoonResponse.body()}")
-
+                val comingSoonResponse = apiService.getComingSoonBazaars(token = token)
                 if (comingSoonResponse.isSuccessful) {
-                    val bazaarList = comingSoonResponse.body()
-                    println("Coming Soon Bazaars received: $bazaarList")
-                    _comingSoonBazaars.value = bazaarList ?: emptyList()
+                    _comingSoonBazaars.value = comingSoonResponse.body() ?: emptyList()
                 } else {
-                    println("Coming Soon Error: ${comingSoonResponse.errorBody()?.string()}")
-                    _error.value = "Gagal mengambil data bazaar yang akan datang: ${comingSoonResponse.code()}"
+                    _error.value = "Failed to fetch upcoming bazaars: ${comingSoonResponse.code()}"
                 }
             } catch (e: Exception) {
-                println("Network Error: ${e.message}")
-                e.printStackTrace()
-                _error.value = "Error jaringan: ${e.message}"
+                _error.value = "Network error: ${e.message}"
             }
         }
+    }
+}
+
+class DashboardViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return DashboardViewModel(context) as T
     }
 }

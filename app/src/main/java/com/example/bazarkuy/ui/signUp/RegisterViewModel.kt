@@ -1,6 +1,9 @@
 package com.example.bazarkuy.ui.signUp
 
+import android.app.Application
+import android.content.Context
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +15,7 @@ import com.example.bazarkuy.data.remote.retrofit.ApiService
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(private val context: Context) : ViewModel() {
     private val _registerState = MutableLiveData<RegisterState>()
     val registerState: LiveData<RegisterState> = _registerState
 
@@ -21,22 +24,15 @@ class RegisterViewModel : ViewModel() {
             _registerState.value = RegisterState.Loading
             try {
                 val request = RegisterRequest(email, name, password, role)
-                Log.d("RegisterViewModel", "Request: $request") // Log request
-
-                val response = ApiConfig.apiService.register(request)
+                val apiService = ApiConfig.getApiService(context)
+                val response = apiService.register(request)
                 if (response.isSuccessful) {
-                    Log.d("RegisterViewModel", "Response: ${response.body()}") // Log respons sukses
                     _registerState.value = RegisterState.Success(response.body()!!)
                 } else {
-                    Log.e(
-                        "RegisterViewModel",
-                        "Error: ${response.errorBody()?.string()}"
-                    ) // Log respons error
-                    _registerState.value = RegisterState.Error(response.message())
+                    _registerState.value = RegisterState.Error(response.errorBody()?.string() ?: "Unknown error")
                 }
             } catch (e: Exception) {
-                Log.e("RegisterViewModel", "Exception: ${e.localizedMessage}") // Log exception
-                _registerState.value = RegisterState.Error("An error occurred")
+                _registerState.value = RegisterState.Error(e.message ?: "An error occurred")
             }
         }
     }

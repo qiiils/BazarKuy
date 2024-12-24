@@ -1,5 +1,6 @@
 package com.example.bazarkuy.ui.login
 
+import LoginViewModel
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -32,7 +33,7 @@ class LoginActivity : ComponentActivity() {
         setContent {
             LoginScreen(
                 onLoginClick = { email, password ->
-                    viewModel.login(email, password, this)
+                    viewModel.login(email, password)
                 },
                 onSignUpClick = { navigateToRegister() }
             )
@@ -46,19 +47,25 @@ class LoginActivity : ComponentActivity() {
                 }
                 is LoginState.Success -> {
                     Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                    navigateToDashboard(state.data.role)
+                    startActivity(Intent(this, Dashboard::class.java))
+                    finish()
                 }
                 is LoginState.Error -> {
                     Toast.makeText(this, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
                 }
+
+                else -> {}
             }
         }
     }
 
     private fun navigateToDashboard(role: String) {
-        intent.putExtra("USER_ROLE", role) // Kirim role ke Dashboard
-        startActivity(Intent(this, Dashboard::class.java))
-        finish() // Hentikan LoginActivity
+        val intent = Intent(this, Dashboard::class.java).apply {
+            putExtra("USER_ROLE", role)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun navigateToRegister() {

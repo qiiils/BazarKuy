@@ -26,7 +26,7 @@ import com.example.bazarkuy.ui.signUp.RegisterViewModel
 import com.example.bazarkuy.ui.signUp.RegisterState
 
 class RegisterActivity : ComponentActivity() {
-    private val viewModel: RegisterViewModel by viewModels()
+    private val viewModel by viewModels<RegisterViewModel> { RegisterViewModelFactory(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,18 +35,14 @@ class RegisterActivity : ComponentActivity() {
                 RegisterScreen(
                     onRegisterClick = { email, name, password, role ->
                         viewModel.register(email, name, password, role)
-                    navigateToLogin()},
+                    },
                     onLoginClick = {
-                        val intent = Intent(this, LoginActivity::class.java)
-                        startActivity(intent)
-                        finish()
+                        navigateToLogin()
                     }
                 )
             }
         }
 
-
-        // Observe register state
         viewModel.registerState.observe(this) { state ->
             when (state) {
                 is RegisterState.Loading -> {
@@ -54,7 +50,7 @@ class RegisterActivity : ComponentActivity() {
                 }
                 is RegisterState.Success -> {
                     Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show()
-                    // Navigate to another screen if needed
+                    navigateToLogin()
                 }
                 is RegisterState.Error -> {
                     Toast.makeText(this, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
@@ -64,9 +60,8 @@ class RegisterActivity : ComponentActivity() {
     }
 
     private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
-        finish() // Hentikan RegisterActivity
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 }
 

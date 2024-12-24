@@ -22,7 +22,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 _loginState.value = LoginState.Loading
 
                 // Gunakan getApplication() untuk context
-                val response = ApiConfig.getApiService(getApplication<Application>()).login(
+                val response = ApiConfig.getApiService(getApplication()).login(
                     LoginRequest(email, password)
                 )
 
