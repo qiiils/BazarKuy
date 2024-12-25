@@ -2,14 +2,21 @@ package com.example.bazarkuy.data.remote.retrofit
 
 //import com.example.bazarkuy.data.remote.response.
 //import BazarDetailResponse
+import com.example.bazarkuy.data.remote.request.ChangePasswordRequest
+import com.example.bazarkuy.data.remote.request.ProfileRequest
 import com.example.bazarkuy.data.remote.response.ApplyRequest
 import com.example.bazarkuy.data.remote.response.ApplyResponse
+import com.example.bazarkuy.data.remote.response.BazaarRequest
 import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.response.BazarResponse
+import com.example.bazarkuy.data.remote.response.ChangePasswordResponse
+import com.example.bazarkuy.data.remote.response.CreateBazaarResponse
 import com.example.bazarkuy.data.remote.response.LoginRequest
 import com.example.bazarkuy.data.remote.response.LoginResponse
 import com.example.bazarkuy.data.remote.response.RegisterRequest
 import com.example.bazarkuy.data.remote.response.RegisterResponse
+import com.example.bazarkuy.data.remote.response.NotificationResponse
+import com.example.bazarkuy.data.remote.response.ProfileResponse
 import kotlinx.coroutines.runBlocking
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -23,6 +30,7 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -63,6 +71,13 @@ interface ApiService {
         @Header("Authorization") token: String // Tambahkan header token
     ): Response<List<BazarResponse>>
 
+    @POST("api/bazars")
+    suspend fun createBazaar(
+        @Header("Authorization") token: String,
+        @Body request: BazaarRequest
+    ): Response<CreateBazaarResponse>
+
+
     // Fetch bazar detail by ID
     @GET("api/bazars/{id}")
     suspend fun getBazarDetail(
@@ -77,8 +92,35 @@ interface ApiService {
         @Body request: ApplyRequest
     ): Response<ApplyResponse>
 
-}
+    @GET("api/notifications")
+    suspend fun getNotifications(
+        @Header("Authorization") token: String
+    ): Response<List<NotificationResponse>>
 
+    @GET("api/history/applications")
+    suspend fun getApplicationHistory(): List<ApplyResponse>
+
+    // Endpoint untuk riwayat bazar (Penyelenggara Bazar)
+    @GET("api/history/bazars")
+    suspend fun getBazarHistory(): List<BazarResponse>
+
+    @GET("/api/users/profile")
+    suspend fun getProfile(
+        @Header("Authorization") token: String
+    ): Response<ProfileResponse>
+
+    @POST("/api/users/profile/update")
+    suspend fun updateProfile(
+        @Header("Authorization") token: String,
+        @Body request: ProfileRequest
+    ): Response<ProfileResponse>
+
+    @PUT("api/users/change-password")
+    suspend fun changePassword(
+        @Header("Authorization") token: String,
+        @Body request: ChangePasswordRequest
+    ): Response<ChangePasswordResponse>
+}
 // Response wrapper
 data class BazarListResponse(
     val message: String,

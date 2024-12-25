@@ -47,7 +47,9 @@
         <activity
             android:name=".ui.submitform.SubmitFormScreen"
             android:exported="false" />
-
+        <activity
+            android:name=".ui.AddBazarScreen.AddBazaar"
+            android:exported="true" />
     </application>
 
 </manifest>

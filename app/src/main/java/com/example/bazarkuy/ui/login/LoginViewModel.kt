@@ -39,6 +39,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
+
 sealed class LoginState {
     object Loading : LoginState()
     data class Success(val data: LoginResponse) : LoginState()

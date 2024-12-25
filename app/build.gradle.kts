@@ -79,6 +79,7 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation(libs.transport.api)
     implementation(libs.androidx.lifecycle.viewmodel.android)
+    implementation(libs.runtime.livedata)
 
 // Testing
     testImplementation("junit:junit:4.13.2")

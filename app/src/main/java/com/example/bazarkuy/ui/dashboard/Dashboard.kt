@@ -1,6 +1,7 @@
 package com.example.bazarkuy.ui.dashboard
 
 import DashboardViewModel
+import android.content.Context
 import DashboardViewModelFactory
 
 import android.content.Intent
@@ -55,7 +56,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material.FabPosition
-
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.bazarkuy.ui.AddBazarScreen.AddBazaar
+import com.example.bazarkuy.ui.AddBazarScreen.DetailApply
 // Dashboard.kt
 class Dashboard : ComponentActivity() {
     private val viewModel by viewModels<DashboardViewModel> { DashboardViewModelFactory(this) }
@@ -81,8 +85,8 @@ class Dashboard : ComponentActivity() {
                         if (userRole == "Penyelenggara Bazar") {
                             FloatingActionButton(
                                 onClick = {
-                                    // Navigate to AddBazarForm
-//                                    startActivity(Intent(this@Dashboard, AddBazarForm::class.java))
+//                                    NavigateToAddBazarForm()
+                                    startActivity(Intent(this@Dashboard, AddBazaar::class.java))
                                 },
                                 containerColor = Color(0xFF4B6BFF),
                                 modifier = Modifier.padding(16.dp)
@@ -107,10 +111,14 @@ class Dashboard : ComponentActivity() {
                             )
                         }
 
-                        SetupNavGraph(
-                            navController = navController,
-                            dashboardViewModel = viewModel
-                        )
+                        if (userRole != null) {
+                            SetupNavGraph(
+                                navController = navController,
+                                dashboardViewModel = viewModel,
+                                userRole = userRole,       // userRole diteruskan ke NavGraph
+                                context = this@Dashboard
+                            )
+                        }
                     }
                 }
             }
@@ -353,3 +361,13 @@ fun ApplyNowBazaarList(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit
         }
     }
 }
+
+//class DashboardViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
+//    @Suppress("UNCHECKED_CAST")
+//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//        if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
+//            return DashboardViewModel(context) as T
+//        }
+//        throw IllegalArgumentException("Unknown ViewModel class")
+//    }
+//}
