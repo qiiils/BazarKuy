@@ -16,7 +16,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 //        buildConfigField("String", "BASE_URL","\"https://8shnf50m-3000.asse.devtunnels.ms/\"")
-        buildConfigField("String", "BASE_URL", "\"http:/192.168.23.22:3000/\"")
+        buildConfigField("String", "BASE_URL", "\"http:/192.168.198.38:3000/\"")
         vectorDrawables {
             useSupportLibrary = true
         }
