@@ -5,6 +5,7 @@ import DashboardViewModelFactory
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -49,7 +50,11 @@ import com.example.bazarkuy.ui.Navigation.Screen
 import androidx.compose.foundation.clickable
 import com.example.bazarkuy.ui.BazarDetail.BazarDetail
 import com.example.bazarkuy.ui.BazarDetail.BazarDetailScreen
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material.FabPosition
 
 // Dashboard.kt
 class Dashboard : ComponentActivity() {
@@ -57,16 +62,57 @@ class Dashboard : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val userRole = intent.getStringExtra("USER_ROLE")
+
+        Log.d("Dashboard", "User Role: $userRole")
+
         setContent {
+            val navController = rememberNavController()
             Surface(modifier = Modifier.fillMaxSize()) {
-                DashboardScreen(
-                    viewModel = viewModel,
-                    onBazarClick = { bazarId ->
-                        val intent = Intent(this@Dashboard, BazarDetail::class.java)
-                        intent.putExtra("bazarId", bazarId)
-                        startActivity(intent)
+                var showDebugRole by remember { mutableStateOf(false) }
+
+                Scaffold(
+                    bottomBar = {
+                        CustomBottomNavigation(navController = navController)
+                    },
+                    floatingActionButton = {
+                        Log.d("Dashboard", "Checking FAB condition. Is Penyelenggara? ${userRole == "Penyelenggara Bazar"}")
+
+                        if (userRole == "Penyelenggara Bazar") {
+                            FloatingActionButton(
+                                onClick = {
+                                    // Navigate to AddBazarForm
+//                                    startActivity(Intent(this@Dashboard, AddBazarForm::class.java))
+                                },
+                                containerColor = Color(0xFF4B6BFF),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add Bazar",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    },
+                    floatingActionButtonPosition = FabPosition.End
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        if (showDebugRole) {
+                            Text(
+                                text = "Current Role: $userRole",
+                                modifier = Modifier
+                                    .align(Alignment.TopCenter)
+                                    .padding(8.dp)
+                            )
+                        }
+
+                        SetupNavGraph(
+                            navController = navController,
+                            dashboardViewModel = viewModel
+                        )
                     }
-                )
+                }
             }
         }
     }
@@ -134,8 +180,21 @@ class Dashboard : ComponentActivity() {
                 onBazarClick = onBazarClick  // tambahkan ini
             )
             Spacer(modifier = Modifier.height(16.dp))
+
+            //apply now
+            Text(
+                text = "Apply Now",
+                style = TextStyle(fontSize = 20.sp, color = Color.Black, letterSpacing = 1.2.sp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            ApplyNowBazaarList(
+                bazaars = viewModel.applyNowBazaars.value,
+                onBazarClick = onBazarClick
+            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
+
 
     @Composable
     fun OngoingBazaarSlider(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
@@ -245,3 +304,52 @@ class Dashboard : ComponentActivity() {
             }
         }
     }
+@Composable
+fun ApplyNowBazaarList(bazaars: List<BazarResponse>, onBazarClick: (Int) -> Unit) {
+    // Similar to ComingSoonBazaarList but with different styling
+    if (bazaars.isEmpty()) {
+        Text(text = "No open registrations available", color = Color.Gray)
+    } else {
+        Column {
+            bazaars.forEach { bazar ->
+                Row(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(Color(0xFFE8F5E9), RoundedCornerShape(16.dp))
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clickable { onBazarClick(bazar.id) }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.bazaar_image),
+                        contentDescription = "Bazaar Coming Soon",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column {
+                        Text(
+                            text = bazar.name,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Date: ${bazar.registrationStartDate}",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "Location: ${bazar.location}",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+                // ... similar layout to ComingSoonBazaarList ...
+
+            }
+        }
+    }
+}

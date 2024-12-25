@@ -1,5 +1,6 @@
 package com.example.bazarkuy.ui.BazarDetail
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.bazarkuy.ui.submitform.SubmitFormScreen
 import com.example.bazarkuy.data.local.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -192,7 +194,13 @@ fun BazarDetailScreen(
 
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(
-                            onClick = { /* TODO: Handle registration */ },
+                            onClick = {
+                                // Navigate to SubmitFormScreen with bazarId
+                                val intent = Intent(context, SubmitFormScreen::class.java).apply {
+                                    putExtra("bazarId", bazarId)
+                                }
+                                context.startActivity(intent)
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = bazar.status.equals("open", ignoreCase = true)
                         ) {

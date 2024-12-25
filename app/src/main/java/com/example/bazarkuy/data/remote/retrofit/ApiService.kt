@@ -2,6 +2,8 @@ package com.example.bazarkuy.data.remote.retrofit
 
 //import com.example.bazarkuy.data.remote.response.
 //import BazarDetailResponse
+import com.example.bazarkuy.data.remote.response.ApplyRequest
+import com.example.bazarkuy.data.remote.response.ApplyResponse
 import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.response.BazarResponse
 import com.example.bazarkuy.data.remote.response.LoginRequest
@@ -68,8 +70,14 @@ interface ApiService {
         @Header("Authorization") token: String // Tambahkan header token
     ): Response<BazarDetailResponse>
 
-}
+    @POST("api/applications/bazar/{bazarId}/apply")
+    suspend fun applyToBazar(
+        @Path("bazarId") bazarId: Int,
+        @Header("Authorization") token: String,
+        @Body request: ApplyRequest
+    ): Response<ApplyResponse>
 
+}
 
 // Response wrapper
 data class BazarListResponse(

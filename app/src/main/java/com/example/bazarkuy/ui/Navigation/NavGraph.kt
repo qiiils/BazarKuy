@@ -1,6 +1,7 @@
 package com.example.bazarkuy.ui.Navigation
 
 import DashboardViewModel
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -13,16 +14,6 @@ import com.example.bazarkuy.ui.dashboard.DashboardScreen
 //import com.example.bazarkuy.ui.history.HistoryScreen
 //import com.example.bazarkuy.ui.notifications.NotificationsScreen
 //import com.example.bazarkuy.ui.profile.ProfileScreen
-
-sealed class NavRoutes(val route: String) {
-    object Home : NavRoutes("home")
-    object History : NavRoutes("history")
-    object Notifications : NavRoutes("notifications")
-    object Profile : NavRoutes("profile")
-    object BazarDetail : NavRoutes("bazar_detail/{bazarId}") {
-        fun createRoute(bazarId: Int) = "bazar_detail/$bazarId"
-    }
-}
 
 
 @Composable
@@ -55,18 +46,20 @@ fun SetupNavGraph(
                 onBackClick = { navController.navigateUp() }
             )
         }
+
+        composable(Screen.History.route) {
+            // Add your History screen here
+            Text("History Screen")
+        }
+
+        composable(Screen.Notifications.route) {
+            // Add your Notifications screen here
+            Text("Notifications Screen")
+        }
+
+        composable(Screen.Profile.route) {
+            // Add your Profile screen here
+            Text("Profile Screen")
+        }
     }
 }
-        // Other Routes
-//        composable(NavRoutes.History.route) {
-//            HistoryScreen()
-//        }
-//
-//        composable(NavRoutes.Notifications.route) {
-//            NotificationsScreen()
-//        }
-//
-//        composable(NavRoutes.Profile.route) {
-//            ProfileScreen()
-
-//}

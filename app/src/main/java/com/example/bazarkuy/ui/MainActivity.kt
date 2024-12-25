@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.bazarkuy.ProfileScreen
 import com.example.bazarkuy.R
+import com.example.bazarkuy.ui.Profile.EditProfileScreen
 
 val Poppins = FontFamily(
     Font(R.font.poppins_semibold)

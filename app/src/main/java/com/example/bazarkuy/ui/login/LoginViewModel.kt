@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.bazarkuy.data.local.UserPreferences
 import com.example.bazarkuy.data.remote.response.LoginRequest
 import com.example.bazarkuy.data.remote.response.LoginResponse
+//import com.example.bazarkuy.data.remote.response.UserRoles
 import com.example.bazarkuy.data.remote.retrofit.ApiConfig
 import kotlinx.coroutines.launch
 import retrofit2.Response
-import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
     private val _loginState = MutableLiveData<LoginState>()
@@ -39,7 +39,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
-
 sealed class LoginState {
     object Loading : LoginState()
     data class Success(val data: LoginResponse) : LoginState()

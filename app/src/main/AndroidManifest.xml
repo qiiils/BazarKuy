@@ -44,6 +44,9 @@
         <activity
             android:name=".ui.BazarDetail.BazarDetail"
             android:exported="false" />
+        <activity
+            android:name=".ui.submitform.SubmitFormScreen"
+            android:exported="false" />
 
     </application>
 
