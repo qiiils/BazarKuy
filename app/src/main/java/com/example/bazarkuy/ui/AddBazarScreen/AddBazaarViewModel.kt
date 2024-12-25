@@ -17,81 +17,56 @@ import java.io.IOException
 class AddBazaarViewModel(private val apiService: ApiService) : ViewModel() {
 
     // State for form fields
-    private val _deskripsiAcara = MutableStateFlow("")
-    val deskripsiAcara: StateFlow<String> = _deskripsiAcara
+    val deskripsiAcara = MutableStateFlow("")
+    val namaAcara = MutableStateFlow("")
+    val startEventDate = MutableStateFlow("")
+    val endEventDate = MutableStateFlow("")
+    val registrationStartDate = MutableStateFlow("")
+    val registrationEndDate = MutableStateFlow("")
+    val lokasi = MutableStateFlow("")
+    val termsAndConditions = MutableStateFlow("")
 
-    private val _namaAcara = MutableStateFlow("")
-    val namaAcara: StateFlow<String> = _namaAcara
-
-    private val _tanggalPelaksanaan = MutableStateFlow("")
-    val tanggalPelaksanaan: StateFlow<String> = _tanggalPelaksanaan
-
-    private val _lokasi = MutableStateFlow("")
-    val lokasi: StateFlow<String> = _lokasi
-
-    private val _tema = MutableStateFlow("")
-    val tema: StateFlow<String> = _tema
-
-    // State for submission
+    // Submission state
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
-    private val _isSuccess = MutableStateFlow(false)
-    val isSuccess: StateFlow<Boolean> = _isSuccess
+    private val _createdBazaar = MutableStateFlow<BazarResponse?>(null)
+    val createdBazaar: StateFlow<BazarResponse?> = _createdBazaar
 
-    // Update field states
-    fun updateDeskripsiAcara(value: String) {
-        _deskripsiAcara.value = value
-    }
-
-    fun updateNamaAcara(value: String) {
-        _namaAcara.value = value
-    }
-
-    fun updateTanggalPelaksanaan(value: String) {
-        _tanggalPelaksanaan.value = value
-    }
-
-    fun updateLokasi(value: String) {
-        _lokasi.value = value
-    }
-
-    fun updateTema(value: String) {
-        _tema.value = value
-    }
-
-    // Submit form data to API
-    fun submitBazaar() {
+    // Submit data
+    fun submitBazaar(token: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            _isSuccess.value = false
+            _createdBazaar.value = null
 
             val request = BazaarRequest(
-                deskripsiAcara = _deskripsiAcara.value,
-                namaAcara = _namaAcara.value,
-                tanggalPelaksanaan = _tanggalPelaksanaan.value,
-                lokasi = _lokasi.value,
-                tema = _tema.value
+                name = namaAcara.value,
+                description = deskripsiAcara.value,
+                startEventDate = startEventDate.value,
+                endEventDate = endEventDate.value,
+                registrationStartDate = registrationStartDate.value,
+                registrationEndDate = registrationEndDate.value,
+                location = lokasi.value,
+                termsAndConditions = termsAndConditions.value
             )
 
             try {
-                val token = "Bearer ${getStoredToken()}" // Ambil token dari penyimpanan
-                val response: Response<String> = ApiService.createBazaar(token, request)
-
-                if (response.isSuccessful) {
-                    _isSuccess.value = true
+                // Log token untuk memastikan dikirimkan dengan benar
+                println("Token: $token")
+                val response = apiService.createBazaar("Bearer $token", request)
+                if (response.isSuccessful && response.body() != null) {
+                    _createdBazaar.value = response.body()
                 } else {
-                    _errorMessage.value =
-                        response.errorBody()?.string() ?: "Failed to create bazaar"
+                    _errorMessage.value = response.errorBody()?.string() ?: "Unknown error"
                 }
             } catch (e: HttpException) {
-                _errorMessage.value = "Failed to submit: ${e.message()}"
+                _errorMessage.value = "HTTP Error: ${e.message}"
             } catch (e: IOException) {
-                _errorMessage.value = "Network error: ${e.message}"
+                _errorMessage.value = "Network Error: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
@@ -99,36 +74,6 @@ class AddBazaarViewModel(private val apiService: ApiService) : ViewModel() {
     }
 }
 
-fun createBazaar() {
-    viewModelScope.launch {
-        _isLoading.value = true
-        _errorMessage.value = null
 
-        val request = BazaarRequest(
-            deskripsiAcara = _deskripsiAcara.value,
-            namaAcara = _namaAcara.value,
-            tanggalPelaksanaan = _tanggalPelaksanaan.value,
-            lokasi = _lokasi.value,
-            tema = _tema.value
-        )
-
-        try {
-            val token = "Bearer ${getStoredToken()}"
-            val response = ApiService.createBazaar(token, request)
-
-            if (response.isSuccessful && response.body() != null) {
-                _isSuccess.value = true
-            } else {
-                _errorMessage.value = response.errorBody()?.string() ?: "Failed to create bazaar"
-            }
-        } catch (e: HttpException) {
-            _errorMessage.value = "Failed to submit: ${e.message()}"
-        } catch (e: IOException) {
-            _errorMessage.value = "Network error: ${e.message}"
-        } finally {
-            _isLoading.value = false
-        }
-    }
-}
 
 

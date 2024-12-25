@@ -40,7 +40,8 @@ class ListProgressViewModel(private val context: Context) : ViewModel() {
                             location = "",
                             status = application.status,
                             startEventDate = "",
-                            organizerId = 0
+                            organizerId = 0,
+                            termsAndConditions = ""
                         )
                     }
                 } else {

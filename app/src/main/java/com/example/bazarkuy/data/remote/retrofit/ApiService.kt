@@ -7,8 +7,8 @@ import com.example.bazarkuy.data.remote.request.ProfileRequest
 import com.example.bazarkuy.data.remote.response.ApplyRequest
 import com.example.bazarkuy.data.remote.response.ApplyResponse
 import com.example.bazarkuy.data.remote.response.BazaarRequest
-import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.response.BazarResponse
+import com.example.bazarkuy.data.remote.response.BazarDetailResponse
 import com.example.bazarkuy.data.remote.response.ChangePasswordResponse
 import com.example.bazarkuy.data.remote.response.CreateBazaarResponse
 import com.example.bazarkuy.data.remote.response.LoginRequest
@@ -71,12 +71,6 @@ interface ApiService {
         @Header("Authorization") token: String // Tambahkan header token
     ): Response<List<BazarResponse>>
 
-    @POST("api/bazars")
-    suspend fun createBazaar(
-        @Header("Authorization") token: String,
-        @Body request: BazaarRequest
-    ): Response<CreateBazaarResponse>
-
 
     // Fetch bazar detail by ID
     @GET("api/bazars/{id}")
@@ -120,6 +114,12 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body request: ChangePasswordRequest
     ): Response<ChangePasswordResponse>
+
+    @POST("/api/bazars")
+    suspend fun createBazaar(
+        @Header("Authorization") token: String,
+        @Body request: BazaarRequest
+    ): Response<BazarResponse>
 }
 // Response wrapper
 data class BazarListResponse(
